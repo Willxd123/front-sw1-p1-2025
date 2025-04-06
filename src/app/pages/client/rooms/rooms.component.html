@@ -1,0 +1,167 @@
+<div class="flex min-h-screen bg-gray-600">
+  <!-- oyente del sidebar -->
+  <app-sidebar></app-sidebar>
+  <div class="p-4 xl:ml-64 w-full">
+    <nav class="block w-full max-w-full bg-transparent text-white shadow-none rounded-xl transition-all px-0 py-1">
+      <app-navegation />
+    </nav>
+    <!-- Contenedor de Relaciones -->
+    <div class="controls">
+
+    </div>
+    <div class="mt-4 ">
+
+      <div class="card">
+        <div #canvas id="konva-container" style="width: 100%; height: 100%; background-color: #ffffff; overflow: auto;"></div>
+        <div class="button-container">
+          <button (click)="addRectangle()">Agregar Rectángulo</button>
+          <button (click)="addCircle()">Agregar Círculo</button>
+        </div>
+      </div>
+      
+      
+      
+      
+      
+    </div>
+  </div>
+  <div class="bg-graygreen-1100 z-40 w-[400px] h-screen transition-transform -translate-x-full sm:translate-x-0">
+    <div class="h-full px-3 pb-4 overflow-y-auto space-y-4">
+      <div class="relative border-b">
+        <div class="flex flex-col items-start py-2 px-8">
+          <h1 class="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-white">
+           
+          </h1>
+
+        </div>
+      </div>
+
+      <ul class="mb-8 flex flex-col gap-1 space-y-2">
+        <li class="space-y-2 ">
+          <div class="flex items-center px-2">
+            <h1 class="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-white">
+              Posicion:
+            </h1>
+          </div>
+
+          <div class="relative overflow-x-auto shadow-slate-100">
+            <div class="flex items-center space-x-2">
+
+              <!-- x -->
+              <div class="relative w-full">
+                <span
+                  class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">X:</span>
+                <input type="text" class=" text-white bg-graygreen-1000 pl-7 px-3 py-1 text-sm w-full rounded-md " />
+              </div>
+
+              <!-- y -->
+              <div class="relative w-full">
+                <span
+                  class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">Y:</span>
+                <input type="text"
+                  class="rounded-md bg-graygreen-1000 pl-7 pr-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-800 focus:border-spacing-16 w-full" />
+              </div>
+
+            </div>
+          </div>
+
+          <button
+            class="bg-blue-900 text-white w-full text-sm px-3 py-1 rounded-md hover:bg-blue-500 transition-all shadow">
+            Guardar
+          </button>
+
+        </li>
+        <hr>
+        <li class="space-y-2 ">
+          <div class="flex items-center px-2">
+            <h1 class="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-white">
+              Dimenciones:
+            </h1>
+          </div>
+
+          <div class="relative overflow-x-auto shadow-slate-100">
+            <div class="flex items-center space-x-2">
+              <!-- w -->
+              <div class="relative w-full">
+                <span
+                  class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">W:</span>
+                <input type="text" class=" text-white bg-graygreen-1000 pl-8 px-3 py-1 text-sm w-full rounded-md " />
+              </div>
+              <!-- h -->
+              <div class="relative w-full">
+                <span
+                  class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">H:</span>
+                <input type="text" class=" text-white bg-graygreen-1000 pl-7 px-3 py-1 text-sm w-full rounded-md " />
+              </div>
+
+            </div>
+          </div>
+          <button
+            class="bg-blue-900 text-white w-full text-sm px-3 py-1 rounded-md hover:bg-blue-500 transition-all shadow">
+            Guardar
+          </button>
+
+        </li>
+        <hr>
+        <li class="space-y-2 ">
+          <div class="flex items-center space-x-14">
+            <h1 class="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-white">
+              Apariencia:
+            </h1>
+          </div>
+          <div class="relative overflow-x-auto ">
+            <div class="flex items-center space-x-4">
+              <div class="flex flex-col w-full">
+                <label class="text-sm text-gray-300 mb-1">Opacidad</label>
+                <input type="text" class=" text-white bg-graygreen-1000 px-3 py-1 text-sm w-full rounded-md " />
+              </div>
+              <div class="flex flex-col w-full">
+                <label class="text-sm text-gray-300 mb-1">Curvatura</label>
+                <input type="text" class=" text-white bg-graygreen-1000 px-3 py-1 text-sm w-full rounded-md " />
+              </div>
+            </div>
+          </div>
+
+          <button
+            class="bg-blue-900 text-white w-full text-sm px-3 py-1 rounded-md hover:bg-blue-500 transition-all shadow">
+            Guardar
+          </button>
+          <hr>
+        </li>
+        <hr>
+        <li>
+          <div class="bg-gray-200 p-4 rounded-lg shadow">
+            <h2 class="font-semibold text-gray-800">Detalles de la Clase</h2>
+            <p>
+              <input type="text">
+            </p>
+            <p></p>
+            <p></p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="">
+    <div
+      class=" fixed z-50 w-full h-16 max-w-lg -translate-x-1/2 bg-black/30  border border-gray-200 backdrop-blur-sm rounded-3xl bottom-4 left-1/2 ">
+      <div class="grid h-full max-w-lg grid-cols-5 mx-auto">
+        <button data-tooltip-target="tooltip-home" type="button"
+          class="inline-flex flex-col items-center justify-center px-5 rounded-s-full  group">
+          <svg
+            class="w-5 h-5 mb-1 text-gray-700 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500"
+            aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
+          </svg>
+          <span class="sr-only">Home</span>
+        </button>
+        <div id="tooltip-home" role="tooltip"
+          class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
+          Home
+          <div class="tooltip-arrow" data-popper-arrow></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
