@@ -10,6 +10,7 @@ import { environment } from '../../environments/environment';
 export class ServerService {
   private socket: Socket;
 
+
   constructor() {
     this.socket = io(environment.SERVER_URL, {
       auth: {
@@ -74,6 +75,39 @@ export class ServerService {
   }
 
   //----------------objetos---------------
+  emitAddObject(roomCode: string, objectData: any): void {
+    this.socket.emit('addObject', { roomCode, objectData });
+  }
+
+  onObjectAdded(): Observable<any> {
+    return new Observable((observer) => {
+      this.socket.on('objectAdded', (objectData) => {
+        observer.next(objectData);
+      });
+    });
+  }
+
+  onInitialCanvasState(): Observable<any[]> {
+    return new Observable((observer) => {
+      this.socket.on('initialCanvasState', (objects) => {
+        console.log('📨 Recibido initialCanvasState desde servidor:', objects);
+        observer.next(objects);
+      });
+
+    });
+  }
+  //-------mover objeto
+  emitMoveObject(roomCode: string, objectId: string, x: number, y: number): void {
+    this.socket.emit('moveObject', { roomCode, objectId, x, y });
+  }
+
+  onObjectMoved(): Observable<{ objectId: string; x: number; y: number }> {
+    return new Observable((observer) => {
+      this.socket.on('objectMoved', (data) => {
+        observer.next(data);
+      });
+    });
+  }
 
 
 }

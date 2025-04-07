@@ -57,6 +57,7 @@ export class RoomsComponent implements OnInit, AfterViewInit {
   private selectionRectangle!: Konva.Rect;
   private isSelecting = false;
   private startSelectionPos: Point = { x: 0, y: 0 };
+  private shapeMap: Map<string, Konva.Shape> = new Map(); //busca objetos por su id
 
   constructor(
     private route: ActivatedRoute,
@@ -71,11 +72,30 @@ export class RoomsComponent implements OnInit, AfterViewInit {
     if (this.roomCode) {
       this.serverService.joinRoom(this.roomCode);
     }
+    //--------------socket para el objeto
+    // Recibir estado inicial del canvas
+
   }
 
   ngAfterViewInit(): void {
     this.initializeCanvas();
-    this.addRectangle(); // Agregar un rectángulo inicial
+    // 👇 PEDIR el contenido del canvas al servidor
+    this.serverService.onInitialCanvasState().subscribe((objects) => {
+      objects.forEach((obj) => this.createRectangle(obj));
+    });
+    this.serverService.onObjectAdded().subscribe((objectData) => {
+      this.createRectangle(objectData);
+    });
+
+    this.serverService.onObjectMoved().subscribe(({ objectId, x, y }) => {
+      const shape = this.shapeMap.get(objectId);
+      if (shape) {
+        shape.position({ x, y });
+        this.layer.batchDraw();
+      }
+    });
+
+
     window.addEventListener('keydown', this.handleKeyDown.bind(this));
     this.cdr.detectChanges();
   }
@@ -218,10 +238,19 @@ export class RoomsComponent implements OnInit, AfterViewInit {
   }
   // Método para actualizar las posiciones
   updateShapePosition(shape: Konva.Shape): void {
-    shape.x(this.shapeTempX);
-    shape.y(this.shapeTempY);
+    shape.position({ x: this.shapeTempX, y: this.shapeTempY });
+
+    // 🔁 Emitir el cambio de posición por socket
+    this.serverService.emitMoveObject(
+      this.roomCode,
+      shape.id(), // Asegúrate que tiene ID válido
+      this.shapeTempX,
+      this.shapeTempY
+    );
+
     this.layer.batchDraw();
   }
+
 
   // Nuevo método para actualizar las dimensiones (width, height)
   updateShapeDimensions(): void {
@@ -234,67 +263,69 @@ export class RoomsComponent implements OnInit, AfterViewInit {
   }
 
   addRectangle(): void {
-    const rect = new Konva.Rect({
+    const rectData = {
+      id: crypto.randomUUID(), // opcional
       x: 1,
       y: 1,
       width: 100,
       height: 100,
       fill: this.getRandomColor(),
-      draggable: true,
       stroke: 'black',
       strokeWidth: 2,
-      name: 'shape'
+      name: 'shape',
+    };
+
+    // 1️⃣ Emitimos por socket (como en addClass)
+    this.serverService.emitAddObject(this.roomCode, rectData);
+
+  }
+
+  createRectangle(rectData: any): void {
+    const rect = new Konva.Rect({
+      ...rectData,
+      id: rectData.id,
+      draggable: true,
     });
 
     this.layer.add(rect);
-    this.shapeTempX = rect.x();
-    this.shapeTempY = rect.y();
-    this.shapeHeight = rect.height();
-    this.shapeWidth = rect.width();
+    this.layer.draw();
+    this.shapeMap.set(rectData.id, rect); // ⬅️ Guardar en el mapa
+    // Eventos para selección, transformación, etc.
     rect.on('click tap', (e) => {
       if (e.evt.ctrlKey || e.evt.metaKey) {
-        // Obtener nodos existentes y hacer una copia
         const currentNodes = this.transformer.nodes();
-
-        // Filtrar solo los Shape válidos (para evitar error de tipos)
-        const shapeNodes = currentNodes.filter(
-          (node): node is Konva.Shape => node instanceof Konva.Shape
-        );
-
+        const shapeNodes = currentNodes.filter((node): node is Konva.Shape => node instanceof Konva.Shape);
         if (!shapeNodes.includes(rect)) {
           shapeNodes.push(rect);
           this.transformer.nodes(shapeNodes);
           this.selectedShapes = shapeNodes;
         }
       } else {
-        this.selectShape(rect); // Ya asigna el transformer
+        this.selectShape(rect);
         this.selectedShapes = [rect];
       }
+    });
 
-      console.log('Seleccionados:', this.selectedShapes);
-    });
-    // Evento de drag para mover el rectángulo
     rect.on('dragmove', () => {
-      this.shapeTempX = rect.x();  // Actualiza shapeTempX y shapeTempY al mover la forma
-      this.shapeTempY = rect.y();
-      this.updateShapePosition(rect);
+      const { x, y } = rect.position();
+      this.shapeTempX = x;
+      this.shapeTempY = y;
+
+      // 🔁 Emitir movimiento por socket (solo 1 vez, directo)
+      this.serverService.emitMoveObject(this.roomCode, rectData.id, x, y);
     });
-    // Evento de transformación (redimensionado) para actualizar las dimensiones
+
+
+
     rect.on('transformend', () => {
-      // Actualiza las dimensiones después de la transformación
       this.shapeWidth = rect.width() * rect.scaleX();
       this.shapeHeight = rect.height() * rect.scaleY();
-
-      // Restablece la escala para evitar distorsión
       rect.width(this.shapeWidth);
       rect.height(this.shapeHeight);
       rect.scaleX(1);
       rect.scaleY(1);
-
       this.updateShapeDimensions();
     });
-
-    this.layer.draw();
   }
 
 
