@@ -76,6 +76,7 @@ export class RoomsComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.initializeCanvas();
     this.addRectangle(); // Agregar un rectángulo inicial
+    window.addEventListener('keydown', this.handleKeyDown.bind(this));
     this.cdr.detectChanges();
   }
 
@@ -83,13 +84,21 @@ export class RoomsComponent implements OnInit, AfterViewInit {
     this.container = this.canvasRef.nativeElement;
     this.width = this.container.offsetWidth;
     this.height = this.container.offsetHeight;
+    const baseWidth = 1200;
+    const baseHeight = 700;
 
+    const actualWidth = this.container.offsetWidth;
+    const actualHeight = this.container.offsetHeight;
+
+    const scaleX = actualWidth / baseWidth;
+    const scaleY = actualHeight / baseHeight;
     this.stage = new Konva.Stage({
       container: this.container.id,
-      width: this.width,
-      height: this.height,
-      pixelRatio: window.devicePixelRatio || 1
+      width: actualWidth,
+      height: actualHeight,
     });
+
+    this.stage.scale({ x: scaleX, y: scaleY });
 
     this.layer = new Konva.Layer();
     this.stage.add(this.layer);
@@ -118,6 +127,21 @@ export class RoomsComponent implements OnInit, AfterViewInit {
 
     this.setupStageEvents();
     this.layer.draw();
+  }
+
+  handleKeyDown(event: KeyboardEvent): void {
+    if ((event.key === 'Delete' || event.key === 'Backspace') && this.selectedShapes.length > 0) {
+      this.deleteSelectedShapes();
+    }
+  }
+  deleteSelectedShapes(): void {
+    this.selectedShapes.forEach(shape => {
+      shape.destroy(); // Elimina el nodo del layer
+    });
+
+    this.selectedShapes = [];
+    this.transformer.nodes([]); // Quita el transformer
+    this.layer.draw(); // Redibuja el layer
   }
 
   private setupStageEvents(): void {
@@ -211,8 +235,8 @@ export class RoomsComponent implements OnInit, AfterViewInit {
 
   addRectangle(): void {
     const rect = new Konva.Rect({
-      x: 880,
-      y: 512,
+      x: 1,
+      y: 1,
       width: 100,
       height: 100,
       fill: this.getRandomColor(),
@@ -260,13 +284,13 @@ export class RoomsComponent implements OnInit, AfterViewInit {
       // Actualiza las dimensiones después de la transformación
       this.shapeWidth = rect.width() * rect.scaleX();
       this.shapeHeight = rect.height() * rect.scaleY();
-      
+
       // Restablece la escala para evitar distorsión
       rect.width(this.shapeWidth);
       rect.height(this.shapeHeight);
       rect.scaleX(1);
       rect.scaleY(1);
-      
+
       this.updateShapeDimensions();
     });
 
