@@ -1,14 +1,186 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
-/* .stroke-control-group {
-    margin-top: 10px;
-    padding: 10px;
-    border: 1px solid #eee;
-    border-radius: 4px;
-  }
-  
-  .stroke-width-control {
-    margin-top: 5px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  } */
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 500px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+}
+
+.modal-content textarea {
+  margin-top: 10px;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+.modal-content button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-content button:hover {
+  background-color: #0056b3;
+}
+.draggable-box {
+  border: 1px solid #555;
+  box-sizing: border-box;
+  padding: 5px;
+  overflow: hidden;
+}
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 600px;
+  max-width: 90%;
+}
+.editor-container {
+  display: flex;
+  height: 100vh;
+  position: relative;
+}
+
+.toolbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #f0f0f0;
+  padding: 10px;
+  display: flex;
+  gap: 5px;
+  z-index: 1000;
+}
+
+.canvas-container {
+  flex: 1;
+  position: relative;
+  background: white;
+  margin-top: 50px;
+  overflow: hidden;
+  border: 1px dashed #ccc;
+  min-height: 500px;
+}
+
+.properties-panel {
+  width: 300px;
+  background: #f8f8f8;
+  padding: 15px;
+  border-left: 1px solid #ddd;
+  overflow-y: auto;
+}
+
+.layers-panel {
+  width: 250px;
+  background: #f0f0f0;
+  padding: 15px;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+}
+
+.control-group {
+  margin-bottom: 15px;
+}
+
+.control-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.control-group input, .control-group textarea {
+  width: 100%;
+  padding: 5px;
+}
+
+.layer-list {
+  margin-top: 10px;
+}
+
+.layer-item {
+  padding: 8px;
+  margin-bottom: 5px;
+  background: white;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+}
+
+.layer-item.selected {
+  background: #e0e0ff;
+  border-color: #aaa;
+}
+
+.z-index {
+  color: #666;
+}
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  width: 80%;
+  height: 70%;
+  overflow: auto;
+  border-radius: 10px;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+  font-size: 28px;
+  cursor: pointer;
+}
+.dragging-highlight {
+  opacity: 0.7;
+  background-color: #d0ebff;
+  border: 1px dashed #339af0;
+}

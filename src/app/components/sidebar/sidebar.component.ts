@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
   imports: [
     RouterModule,
     FormsModule,
-    RoomsComponent,
+/*     RoomsComponent, */
     CommonModule,
   ],
   templateUrl: './sidebar.component.html',

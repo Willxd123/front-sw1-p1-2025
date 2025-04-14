@@ -11,6 +11,7 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "^18.0.0",
+    "@angular/cdk": "^18.2.14",
     "@angular/common": "^18.0.0",
     "@angular/compiler": "^18.0.0",
     "@angular/core": "^18.0.0",
@@ -20,9 +21,11 @@
     "@angular/router": "^18.0.0",
     "examen1-sw-f": "file:",
     "flowbite": "^2.5.2",
+    "grapesjs-plugin-export": "^1.0.12",
     "konva": "^9.3.20",
     "ngx-socket-io": "^4.7.0",
     "rxjs": "~7.8.0",
+    "sortablejs": "^1.15.6",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"
   },
@@ -31,6 +34,7 @@
     "@angular/cli": "^18.0.1",
     "@angular/compiler-cli": "^18.0.0",
     "@types/jasmine": "~5.1.0",
+    "@types/sortablejs": "^1.15.8",
     "autoprefixer": "^10.4.20",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
