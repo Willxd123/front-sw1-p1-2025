@@ -1,187 +1,140 @@
-<div class="flex min-h-screen bg-gray-600">
-  <!-- oyente del sidebar -->
-  <app-sidebar></app-sidebar>
-  <div class="p-4 xl:ml-64 w-full">
-    <nav class="block w-full max-w-full bg-transparent text-white shadow-none rounded-xl transition-all px-0 py-1">
-      <app-navegation />
-    </nav>
-    <!-- Contenedor de Relaciones -->
-    <div class="controls">
+<div class="w-full h-screen flex">
+  <!-- Panel de propiedades -->
+  <div class="w-[20%] bg-gray-100 p-4 border-r border-gray-300 overflow-auto">
+
+    <h2 class="text-lg font-semibold mb-4">Propiedades</h2>
+    <!-- Botón para abrir modal -->
+    <button class="mt-4 w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" (click)="openModal()">
+      Ver HTML/CSS
+    </button>
+
+    <div *ngIf="selectedComponent">
+
+      <!-- Dimensiones -->
+      <!-- Posición -->
+<!--       <label class="block mb-2">Top (px)</label>
+      <input type="number" [(ngModel)]="selectedComponentTop" (input)="updateComponentTransform()"
+        class="w-full border p-1 mb-2" />
+
+      <label class="block mb-2">Left (px)</label>
+      <input type="number" [(ngModel)]="selectedComponentLeft" (input)="updateComponentTransform()"
+        class="w-full border p-1 mb-2" />
+ -->
+      <!-- Dimensiones -->
+      <label class="block mb-2">Ancho (px)</label>
+      <input type="number" [(ngModel)]="selectedComponentWidth" (input)="updateComponentTransform()"
+        class="w-full border p-1 mb-2" />
+
+      <label class="block mb-2">Alto (px)</label>
+      <input type="number" [(ngModel)]="selectedComponentHeight" (input)="updateComponentTransform()"
+        class="w-full border p-1 mb-2" />
+
+
+      <label class="block mb-2">Color fondo</label>
+      <input type="color" [(ngModel)]="selectedComponent.style.backgroundColor" class="w-full border p-1 mb-2" />
+      <label class="block mb-2">Posición TOP</label>
+      <input type="number" [(ngModel)]="selectedComponentTop" (input)="updateComponentPosition()"
+        class="w-full border p-1 mb-2" />
+
+      <label class="block mb-2">Posición LEFT</label>
+      <input type="number" [(ngModel)]="selectedComponentLeft" (input)="updateComponentPosition()"
+        class="w-full border p-1 mb-2" />
 
     </div>
-    <div class="mt-4 ">
+    <div *ngIf="!selectedComponent">Selecciona un componente</div>
+  </div>
+  <!-- Vista previa del JSON exportado -->
+  <div class="fixed bottom-0 left-0 w-full bg-gray-200 p-2 text-sm overflow-x-auto max-h-[200px]">
+    <pre>{{ jsonExport | json }}</pre>
+  </div>
 
-      <div class="card">
-        <div #canvas id="konva-container" style="width: 100%; height: 100%; background-color: #c73c3c;">
-        </div>
-        <div class="button-container">
-          <button (click)="addRectangle()">Agregar Rectángulo</button>
-        </div>
-        <div *ngIf="selectedShapes.length > 0">
-          <h4>Figuras seleccionadas:</h4>
-          <ul>
-            <li *ngFor="let shape of selectedShapes">
-              {{ shape.getClassName() }} -
-              <label>X:</label>
-              <input type="number" [(ngModel)]="shapeTempX" (ngModelChange)="updateShapePosition(shape)">
-              <label>Y:</label>
-              <input type="number" [(ngModel)]="shapeTempY" (ngModelChange)="updateShapePosition(shape)">
-            </li>
-          </ul>
-          <div class="shape-properties">
-            <label>Width:</label>
-            <input type="number" [(ngModel)]="shapeWidth" (ngModelChange)="updateShapeDimensions()">
-            <label>Height:</label>
-            <input type="number" [(ngModel)]="shapeHeight" (ngModelChange)="updateShapeDimensions()">
-            <label>Stroke Width:</label>
-            <input type="number" [(ngModel)]="strokeWidth" (ngModelChange)="updateShapeDimensions()">
+  <!-- Canvas central -->
+
+  <!-- ✅ Tu canvas se mantiene igual -->
+  <div class="w-[60%] bg-white relative border border-gray-300 overflow-x-hidden overflow-y-auto h-screen" #canvas>
+
+    <!-- ✅ Renderizado recursivo de componentes -->
+    <ng-container *ngFor="let comp of components">
+      <ng-container *ngTemplateOutlet="renderComponent; context: { comp: comp }"></ng-container>
+    </ng-container>
+
+    <!-- ✅ Líneas guía -->
+    <div *ngIf="guideLines.vertical" [style.left.px]="guideLines.vertical"
+      class="absolute top-0 h-full w-[1px] bg-red-500 z-40 pointer-events-none"></div>
+
+    <div *ngIf="guideLines.horizontal" [style.top.px]="guideLines.horizontal"
+      class="absolute left-0 w-full h-[1px] bg-red-500 z-40 pointer-events-none"></div>
+
+    <!-- ✅ Template recursivo para anidamiento canvas -->
+    <ng-template #renderComponent let-comp="comp">
+      <div class="absolute border border-gray-400 group" [ngStyle]="comp.style" [attr.data-id]="comp.id"
+        (click)="selectComponent(comp); $event.stopPropagation()" (dragover)="onDragOver($event)"
+        (drop)="onDrop($event, comp)" [draggable]="false">
+
+        <!-- Toolbar flotante -->
+        <div
+          class="absolute top-0 left-0 w-full flex justify-end items-center bg-black bg-opacity-40 text-white text-xs py-1 px-2 rounded-t opacity-0 group-hover:opacity-100 transition-opacity z-10">
+          <div class="cursor-ns-resize" (mousedown)="startToolbarDrag($event, comp)">
+            ⠿ Mover
           </div>
         </div>
+
+        <!-- Contenido del componente -->
+        <div class="w-full h-full flex items-center justify-center pointer-events-none select-none">
+          {{ comp.label }}
+        </div>
+
+        <!-- Render hijos -->
+        <ng-container *ngIf="comp.children?.length">
+          <ng-container *ngFor="let child of comp.children">
+            <ng-container *ngTemplateOutlet="renderComponent; context: { comp: child }"></ng-container>
+          </ng-container>
+        </ng-container>
       </div>
-      <button class="bg-red-700 text-white w-full text-sm px-3 py-1 rounded-md hover:bg-red-500 transition-all shadow"
-        (click)="deleteSelectedShapes()">
-        Eliminar Objeto
+    </ng-template>
+
+
+  </div>
+
+  <!-- Panel de componentes -->
+  <div class="w-[20%] bg-gray-100 p-4 border-l border-gray-300">
+    <h2 class="text-lg font-semibold mb-4">Componentes</h2>
+    <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" (click)="addComponent('Caja DIV')">
+      + Caja DIV
+    </button>
+    <button class="mt-2 bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600" (click)="addNavbar()">
+      + Navbar
+    </button>
+
+  </div>
+</div>
+<!-- Modal -->
+<div *ngIf="isModalOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+  <div class="bg-white w-[80%] max-h-[80%] rounded shadow-lg p-4 overflow-y-auto">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold">Código HTML y CSS generado</h2>
+      <button class="text-red-600 text-lg font-bold hover:scale-110" (click)="closeModal()">
+        ✕
       </button>
-
-
     </div>
-  </div>
-  <div class="bg-graygreen-1100 z-40 w-[400px] h-screen transition-transform -translate-x-full sm:translate-x-0">
-    <div class="h-full px-3 pb-4 overflow-y-auto space-y-4">
-      <div class="relative border-b">
-        <div class="flex flex-col items-start py-2 px-8">
-          <h1 class="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-white">
 
-          </h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <h3 class="text-md font-semibold">HTML</h3>
+        <pre class="bg-gray-100 p-2 text-xs rounded whitespace-pre-wrap break-words max-h-[400px] overflow-auto">
+          <code>{{ generatedHtml }}</code>
+        </pre>
 
-        </div>
       </div>
+      <div>
+        <h3 class="text-md font-semibold">CSS Inline</h3>
+        <pre class="bg-gray-100 p-2 text-xs rounded whitespace-pre-wrap break-words max-h-[400px] overflow-auto">
+          <code>{{ generatedCss }}</code>
+        </pre>
 
-      <ul class="mb-8 flex flex-col gap-1 space-y-2">
-        <li class="space-y-2 ">
-          <div class="flex items-center px-2">
-            <h1 class="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-white">
-              Posicion:
-            </h1>
-          </div>
-
-          <div *ngIf="selectedShapes.length > 0" class="relative overflow-x-auto shadow-slate-100">
-            <div *ngFor="let shape of selectedShapes" class="flex items-center space-x-2">
-
-              <!-- x -->
-              <div class="relative w-full">
-                <span
-                  class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">X:</span>
-                <input type="number" [(ngModel)]="shapeTempX" (ngModelChange)="updateShapePosition(shape)"
-                  class=" text-white bg-graygreen-1000 pl-7 px-3 py-1 text-sm w-full rounded-md " />
-              </div>
-
-              <!-- y -->
-              <div class="relative w-full">
-                <span
-                  class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">Y:</span>
-                <input type="number" [(ngModel)]="shapeTempY" (ngModelChange)="updateShapePosition(shape)"
-                  class="rounded-md text-white bg-graygreen-1000 pl-7 pr-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-800 focus:border-spacing-16 w-full" />
-              </div>
-
-            </div>
-          </div>
-
-          <button
-            class="bg-blue-900 text-white w-full text-sm px-3 py-1 rounded-md hover:bg-blue-500 transition-all shadow">
-            Guardar
-          </button>
-
-        </li>
-        <hr>
-        <li class="space-y-2 ">
-          <div class="flex items-center px-2">
-            <h1 class="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-white">
-              Dimenciones:
-            </h1>
-          </div>
-
-          <div class="relative overflow-x-auto shadow-slate-100">
-            <div class="flex items-center space-x-2">
-              <div class="relative w-full">
-                <span
-                  class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">W:</span>
-                <input type="text" class=" text-white bg-graygreen-1000 pl-8 px-3 py-1 text-sm w-full rounded-md " />
-              </div>
-              <div class="relative w-full">
-                <span
-                  class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">H:</span>
-                <input type="text" class=" text-white bg-graygreen-1000 pl-7 px-3 py-1 text-sm w-full rounded-md " />
-              </div>
-
-            </div>
-          </div>
-          <button
-            class="bg-blue-900 text-white w-full text-sm px-3 py-1 rounded-md hover:bg-blue-500 transition-all shadow">
-            Guardar
-          </button>
-
-        </li>
-        <hr>
-        <li class="space-y-2 ">
-          <div class="flex items-center space-x-14">
-            <h1 class="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-white">
-              Apariencia:
-            </h1>
-          </div>
-          <div class="relative overflow-x-auto ">
-            <div class="flex items-center space-x-4">
-              <div class="flex flex-col w-full">
-                <label class="text-sm text-gray-300 mb-1">Opacidad</label>
-                <input type="text" class=" text-white bg-graygreen-1000 px-3 py-1 text-sm w-full rounded-md " />
-              </div>
-              <div class="flex flex-col w-full">
-                <label class="text-sm text-gray-300 mb-1">Curvatura</label>
-                <input type="text" class=" text-white bg-graygreen-1000 px-3 py-1 text-sm w-full rounded-md " />
-              </div>
-            </div>
-          </div>
-
-          <button
-            class="bg-blue-900 text-white w-full text-sm px-3 py-1 rounded-md hover:bg-blue-500 transition-all shadow">
-            Guardar
-          </button>
-          <hr>
-        </li>
-        <hr>
-        <li>
-          <div class="bg-gray-200 p-4 rounded-lg shadow">
-            <h2 class="font-semibold text-gray-800">Detalles de la Clase</h2>
-            <p>
-              <input type="text">
-            </p>
-            <p></p>
-            <p></p>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div class="">
-    <div
-      class=" fixed z-50 w-full h-16 max-w-lg -translate-x-1/2 bg-black/30  border border-gray-200 backdrop-blur-sm rounded-3xl bottom-4 left-1/2 ">
-      <div class="grid h-full max-w-lg grid-cols-5 mx-auto">
-        <button data-tooltip-target="tooltip-home" type="button"
-          class="inline-flex flex-col items-center justify-center px-5 rounded-s-full  group">
-          <svg
-            class="w-5 h-5 mb-1 text-gray-700 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500"
-            aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
-          </svg>
-          <span class="sr-only">Home</span>
-        </button>
-        <div id="tooltip-home" role="tooltip"
-          class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
-          Home
-          <div class="tooltip-arrow" data-popper-arrow></div>
-        </div>
       </div>
     </div>
   </div>
+
+
 </div>
