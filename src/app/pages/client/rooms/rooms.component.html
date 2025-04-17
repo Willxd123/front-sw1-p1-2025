@@ -1,140 +1,106 @@
-<div class="w-full h-screen flex">
-  <!-- Panel de propiedades -->
-  <div class="w-[20%] bg-gray-100 p-4 border-r border-gray-300 overflow-auto">
-
-    <h2 class="text-lg font-semibold mb-4">Propiedades</h2>
-    <!-- Botón para abrir modal -->
-    <button class="mt-4 w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" (click)="openModal()">
-      Ver HTML/CSS
+<div class="flex h-screen w-full">
+  <!-- Panel izquierdo: Agregar componentes -->
+  <aside class="w-[20%] bg-gray-100 p-4 border-r border-gray-300">
+    <h2 class="text-lg font-semibold mb-4">Componentes</h2>
+    <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700" (click)="addComponent('Caja DIV')">
+      Agregar Caja DIV
     </button>
 
-    <div *ngIf="selectedComponent">
-
-      <!-- Dimensiones -->
-      <!-- Posición -->
-<!--       <label class="block mb-2">Top (px)</label>
-      <input type="number" [(ngModel)]="selectedComponentTop" (input)="updateComponentTransform()"
-        class="w-full border p-1 mb-2" />
-
-      <label class="block mb-2">Left (px)</label>
-      <input type="number" [(ngModel)]="selectedComponentLeft" (input)="updateComponentTransform()"
-        class="w-full border p-1 mb-2" />
- -->
-      <!-- Dimensiones -->
-      <label class="block mb-2">Ancho (px)</label>
-      <input type="number" [(ngModel)]="selectedComponentWidth" (input)="updateComponentTransform()"
-        class="w-full border p-1 mb-2" />
-
-      <label class="block mb-2">Alto (px)</label>
-      <input type="number" [(ngModel)]="selectedComponentHeight" (input)="updateComponentTransform()"
-        class="w-full border p-1 mb-2" />
-
-
-      <label class="block mb-2">Color fondo</label>
-      <input type="color" [(ngModel)]="selectedComponent.style.backgroundColor" class="w-full border p-1 mb-2" />
-      <label class="block mb-2">Posición TOP</label>
-      <input type="number" [(ngModel)]="selectedComponentTop" (input)="updateComponentPosition()"
-        class="w-full border p-1 mb-2" />
-
-      <label class="block mb-2">Posición LEFT</label>
-      <input type="number" [(ngModel)]="selectedComponentLeft" (input)="updateComponentPosition()"
-        class="w-full border p-1 mb-2" />
-
+    <!-- Mostrar JSON en el panel derecho -->
+    <div class="mt-6">
+      <h3 class="text-sm font-semibold mb-2">JSON del Canvas</h3>
+      <pre class="text-xs bg-gray-100 p-2 rounded h-40 overflow-auto whitespace-pre-wrap">
+{{ components | json }}
+  </pre>
     </div>
-    <div *ngIf="!selectedComponent">Selecciona un componente</div>
-  </div>
-  <!-- Vista previa del JSON exportado -->
-  <div class="fixed bottom-0 left-0 w-full bg-gray-200 p-2 text-sm overflow-x-auto max-h-[200px]">
-    <pre>{{ jsonExport | json }}</pre>
-  </div>
 
-  <!-- Canvas central -->
+    <!-- Botón para ver HTML -->
+    <button class="mt-4 w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" (click)="openHtmlModal()">
+      Ver HTML generado
+    </button>
 
-  <!-- ✅ Tu canvas se mantiene igual -->
-  <div class="w-[60%] bg-white relative border border-gray-300 overflow-x-hidden overflow-y-auto h-screen" #canvas>
+  </aside>
 
-    <!-- ✅ Renderizado recursivo de componentes -->
+
+
+
+
+  <!-- Panel central: Canvas (BODY) -->
+  <div #canvas class="flex-1 bg-white relative border border-gray-300 overflow-auto"
+    (contextmenu)="onCanvasContextMenu($event) " (mousemove)="onMouseMove($event)" (mouseup)="onMouseUp()">
+    <h2 class="text-center font-semibold py-2 border-b">Canvas: &lt;body&gt;</h2>
+
+    <!-- Renderizado de componentes -->
     <ng-container *ngFor="let comp of components">
       <ng-container *ngTemplateOutlet="renderComponent; context: { comp: comp }"></ng-container>
     </ng-container>
 
-    <!-- ✅ Líneas guía -->
-    <div *ngIf="guideLines.vertical" [style.left.px]="guideLines.vertical"
-      class="absolute top-0 h-full w-[1px] bg-red-500 z-40 pointer-events-none"></div>
 
-    <div *ngIf="guideLines.horizontal" [style.top.px]="guideLines.horizontal"
-      class="absolute left-0 w-full h-[1px] bg-red-500 z-40 pointer-events-none"></div>
-
-    <!-- ✅ Template recursivo para anidamiento canvas -->
-    <ng-template #renderComponent let-comp="comp">
-      <div class="absolute border border-gray-400 group" [ngStyle]="comp.style" [attr.data-id]="comp.id"
-        (click)="selectComponent(comp); $event.stopPropagation()" (dragover)="onDragOver($event)"
-        (drop)="onDrop($event, comp)" [draggable]="false">
-
-        <!-- Toolbar flotante -->
-        <div
-          class="absolute top-0 left-0 w-full flex justify-end items-center bg-black bg-opacity-40 text-white text-xs py-1 px-2 rounded-t opacity-0 group-hover:opacity-100 transition-opacity z-10">
-          <div class="cursor-ns-resize" (mousedown)="startToolbarDrag($event, comp)">
-            ⠿ Mover
-          </div>
-        </div>
-
-        <!-- Contenido del componente -->
-        <div class="w-full h-full flex items-center justify-center pointer-events-none select-none">
-          {{ comp.label }}
-        </div>
-
-        <!-- Render hijos -->
-        <ng-container *ngIf="comp.children?.length">
-          <ng-container *ngFor="let child of comp.children">
-            <ng-container *ngTemplateOutlet="renderComponent; context: { comp: child }"></ng-container>
-          </ng-container>
-        </ng-container>
-      </div>
-    </ng-template>
-
-
-  </div>
-
-  <!-- Panel de componentes -->
-  <div class="w-[20%] bg-gray-100 p-4 border-l border-gray-300">
-    <h2 class="text-lg font-semibold mb-4">Componentes</h2>
-    <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" (click)="addComponent('Caja DIV')">
-      + Caja DIV
-    </button>
-    <button class="mt-2 bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600" (click)="addNavbar()">
-      + Navbar
-    </button>
-
-  </div>
-</div>
-<!-- Modal -->
-<div *ngIf="isModalOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-  <div class="bg-white w-[80%] max-h-[80%] rounded shadow-lg p-4 overflow-y-auto">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold">Código HTML y CSS generado</h2>
-      <button class="text-red-600 text-lg font-bold hover:scale-110" (click)="closeModal()">
-        ✕
+    <!-- Menú contextual -->
+    <div *ngIf="contextMenu.visible" [style.left.px]="contextMenu.x" [style.top.px]="contextMenu.y"
+      class="fixed bg-white border rounded shadow z-[1000]">
+      <button (click)="addChild(contextMenu.targetId)" class="block px-4 py-2 hover:bg-gray-100 w-full text-left">
+        Agregar hijo
+      </button>
+      <button (click)="removeComponent(contextMenu.targetId)"
+        class="block px-4 py-2 hover:bg-gray-100 w-full text-left">
+        Eliminar
       </button>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <h3 class="text-md font-semibold">HTML</h3>
-        <pre class="bg-gray-100 p-2 text-xs rounded whitespace-pre-wrap break-words max-h-[400px] overflow-auto">
-          <code>{{ generatedHtml }}</code>
-        </pre>
-
-      </div>
-      <div>
-        <h3 class="text-md font-semibold">CSS Inline</h3>
-        <pre class="bg-gray-100 p-2 text-xs rounded whitespace-pre-wrap break-words max-h-[400px] overflow-auto">
-          <code>{{ generatedCss }}</code>
-        </pre>
-
-      </div>
-    </div>
   </div>
 
 
+
+
+
+
+  <!-- Panel derecho: Propiedades -->
+  <aside class="w-[20%] bg-gray-50 p-4 border-l border-gray-300">
+    <h2 class="text-lg font-semibold mb-4">Propiedades</h2>
+    <div *ngIf="selectedComponent">
+      <label class="block mb-1">Ancho</label>
+      <input [(ngModel)]="selectedComponent.style.width" type="text" class="w-full border p-1 mb-2">
+
+      <label class="block mb-1">Alto</label>
+      <input [(ngModel)]="selectedComponent.style.height" type="text" class="w-full border p-1 mb-2">
+
+      <label class="block mb-1">Color fondo</label>
+      <input [(ngModel)]="selectedComponent.style.backgroundColor" type="color" class="w-full border p-1 mb-2">
+    </div>
+  </aside>
+
+  <!-- Template de renderizado recursivo -->
+  <ng-template #renderComponent let-comp="comp">
+    <div class="border p-2 text-center cursor-move" [ngStyle]="comp.style"
+      [style.position]="comp.parentId ? 'absolute' : 'relative'" [style.min-width.px]="50" [style.min-height.px]="40"
+      (mousedown)="onMouseDown($event, comp)" (click)="selectComponent(comp, $event)"
+      (contextmenu)="onComponentContextMenu($event, comp.id)">
+      {{ comp.label }}
+
+      <ng-container *ngIf="comp.children">
+        <ng-container *ngFor="let child of comp.children">
+          <ng-container *ngTemplateOutlet="renderComponent; context: { comp: child }"></ng-container>
+        </ng-container>
+      </ng-container>
+    </div>
+  </ng-template>
+</div>
+
+
+
+
+
+
+<!-- Modal HTML generado -->
+<div *ngIf="isModalOpen" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+  <div class="bg-white rounded shadow-lg p-6 w-[80%] max-h-[80%] overflow-auto relative">
+    <h2 class="text-lg font-semibold mb-4">Código HTML Generado</h2>
+    <pre class="text-sm bg-gray-100 p-4 rounded overflow-auto whitespace-pre-wrap max-h-[60vh]">
+{{ exportHtml() }}
+    </pre>
+    <button class="absolute top-2 right-2 text-red-500 hover:text-red-700" (click)="isModalOpen = false">
+      ✖
+    </button>
+  </div>
 </div>
