@@ -75,39 +75,90 @@ export class ServerService {
   }
 
   //----------------objetos---------------
-  emitAddObject(roomCode: string, objectData: any): void {
-    this.socket.emit('addObject', { roomCode, objectData });
-  }
-
-  onObjectAdded(): Observable<any> {
-    return new Observable((observer) => {
-      this.socket.on('objectAdded', (objectData) => {
-        observer.next(objectData);
+  onInitialCanvasLoad(): Observable<any[]> {
+    return new Observable(observer => {
+      this.socket.on('initialCanvasLoad', (components) => {
+        observer.next(components);
       });
     });
   }
+  //agrega componente
+  addCanvasComponent(roomCode: string, component: any) {
+    this.socket.emit('addComponent', { roomCode, component });
+  }
 
-  onInitialCanvasState(): Observable<any[]> {
+  onComponentAdded(): Observable<any> {
     return new Observable((observer) => {
-      this.socket.on('initialCanvasState', (objects) => {
-        console.log('📨 Recibido initialCanvasState desde servidor:', objects);
-        observer.next(objects);
+      this.socket.on('componentAdded', (component) => {
+        observer.next(component);
       });
-
     });
   }
-  //-------mover objeto
-  emitMoveObject(roomCode: string, objectId: string, x: number, y: number): void {
-    this.socket.emit('moveObject', { roomCode, objectId, x, y });
+  //agrega hijo
+  addChildComponent(roomCode: string, parentId: string, childComponent: any) {
+    this.socket.emit('addChildComponent', { roomCode, parentId, childComponent });
   }
 
-  onObjectMoved(): Observable<{ objectId: string; x: number; y: number }> {
+  onChildComponentAdded(): Observable<any> {
     return new Observable((observer) => {
-      this.socket.on('objectMoved', (data) => {
+      this.socket.on('childComponentAdded', ({ parentId, childComponent }) => {
+        observer.next({ parentId, childComponent });
+      });
+    });
+  }
+  //remover
+  removeCanvasComponent(roomCode: string, componentId: string) {
+    this.socket.emit('removeComponent', { roomCode, componentId });
+  }
+
+  onComponentRemoved(): Observable<string> {
+    return new Observable((observer) => {
+      this.socket.on('componentRemoved', (componentId: string) => {
+        observer.next(componentId);
+      });
+    });
+  }
+  //movimiento
+  // Agrega estos métodos al ServerService
+
+  // Para mover componentes
+  moveComponent(roomCode: string, componentId: string, newPosition: { left: string, top: string }) {
+    this.socket.emit('moveComponent', { roomCode, componentId, newPosition });
+  }
+
+  onComponentMoved(): Observable<{ componentId: string, newPosition: { left: string, top: string } }> {
+    return new Observable((observer) => {
+      this.socket.on('componentMoved', (data) => {
         observer.next(data);
       });
     });
   }
 
+  // Para transformar componentes (cambiar tamaño)
+  transformComponent(roomCode: string, componentId: string, newSize: { width: string, height: string }) {
+    this.socket.emit('transformComponent', { roomCode, componentId, newSize });
+  }
 
+  onComponentTransformed(): Observable<{ componentId: string, newSize: { width: string, height: string } }> {
+    return new Observable((observer) => {
+      this.socket.on('componentTransformed', (data) => {
+        observer.next(data);
+      });
+    });
+  }
+  // Agrega o reemplaza estos métodos en tu ServerService
+
+  // Método unificado para actualizar cualquier propiedad
+  updateComponentProperties(roomCode: string, componentId: string, updates: any) {
+    this.socket.emit('updateComponentProperties', { roomCode, componentId, updates });
+  }
+
+  // Escucha cambios en las propiedades
+  onComponentPropertiesUpdated(): Observable<{ componentId: string, updates: any }> {
+    return new Observable((observer) => {
+      this.socket.on('componentPropertiesUpdated', (data) => {
+        observer.next(data);
+      });
+    });
+  }
 }
