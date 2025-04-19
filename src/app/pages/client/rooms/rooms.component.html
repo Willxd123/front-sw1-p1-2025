@@ -1,58 +1,55 @@
 <div class="flex h-screen w-full">
 
-  <!-- Panel izquierdo: Agregar componentes -->
-  <aside class="w-[20%] bg-gray-100 p-4 border-r border-gray-300">
-    <h2 class="text-lg font-semibold mb-4">Componentes</h2>
-    <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700" (click)="addComponent('Caja DIV')">
-      Agregar Caja DIV
-    </button>
-
-    <!-- Mostrar JSON en el panel derecho -->
-    <div class="mt-6">
-      <h3 class="text-sm font-semibold mb-2">JSON del Canvas</h3>
-      <pre class="text-xs bg-gray-100 p-2 rounded h-40 overflow-auto whitespace-pre-wrap">
-{{ components | json }}
-  </pre>
-    </div>
-
-    <!-- Botón para ver HTML -->
-    <button class="mt-4 w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" (click)="openHtmlModal()">
-      Ver HTML generado
-    </button>
-    <!-- Add this button below the "Agregar Caja DIV" button in the left panel -->
-    <button class="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 mt-2" (click)="loadSampleJson()">
-      Cargar JSON de ejemplo
-    </button>
-
-  </aside>
+  <app-sidebar-izq class="bg-zinc-800 w-[20%]  p-4 border-r border-gray-300" [components]="components"
+    [roomCode]="roomCode" [contextMenu]="contextMenu" [isModalOpen]="isModalOpen">
+  </app-sidebar-izq>
 
 
 
 
 
-  <!-- Panel central: Canvas (BODY) -->
-  <div #canvas class="flex-1 bg-white relative border border-gray-300 overflow-auto"
-    (contextmenu)="onCanvasContextMenu($event) " (mousemove)="onMouseMove($event)" (mouseup)="onMouseUp()">
 
-    <!-- Renderizado de componentes -->
-    <ng-container *ngFor="let comp of components">
-      <ng-container *ngTemplateOutlet="renderComponent; context: { comp: comp }"></ng-container>
-    </ng-container>
-    <app-navegation></app-navegation>
+  <div class="flex flex-col flex-1 border border-none">
 
-    <!-- Menú contextual -->
-    <div *ngIf="contextMenu.visible" [style.left.px]="contextMenu.x" [style.top.px]="contextMenu.y"
-      class="fixed bg-white border rounded shadow z-[1000]">
-      <button (click)="addChild(contextMenu.targetId)" class="block px-4 py-2 hover:bg-gray-100 w-full text-left">
-        Agregar hijo
-      </button>
-      <button (click)="removeComponent(contextMenu.targetId)"
-        class="block px-4 py-2 hover:bg-gray-100 w-full text-left">
-        Eliminar
-      </button>
+    <!-- Panel central: Canvas (BODY) -->
+    <div #canvas class="flex-1 bg-gray-100 relative border border-gray-300 overflow-auto py-8"
+      (contextmenu)="onCanvasContextMenu($event) " (mousemove)="onMouseMove($event)" (mouseup)="onMouseUp()">
+
+      <!-- Renderizado de componentes -->
+      <ng-container *ngFor="let comp of components">
+        <ng-container *ngTemplateOutlet="renderComponent; context: { comp: comp }"></ng-container>
+      </ng-container>
+
+
+      <!-- Menú contextual -->
+      <div *ngIf="contextMenu.visible" [style.left.px]="contextMenu.x" [style.top.px]="contextMenu.y"
+        class="fixed bg-white border rounded shadow z-[1000]">
+        <button (click)="addChild(contextMenu.targetId)" class="block px-4 py-2 hover:bg-gray-100 w-full text-left">
+          Agregar hijo
+        </button>
+        <button (click)="copyComponent(findComponentById(contextMenu.targetId, components)!)"
+          class="block px-4 py-2 hover:bg-gray-100 w-full text-left">
+          Copiar
+        </button>
+        <button (click)="cutComponent(findComponentById(contextMenu.targetId, components)!)"
+          class="block px-4 py-2 hover:bg-gray-100 w-full text-left">
+          Cortar
+        </button>
+        <button (click)="pasteComponent(contextMenu.targetId)"
+          class="block px-4 py-2 hover:bg-gray-100 w-full text-left">
+          Pegar dentro
+        </button>
+        <button (click)="removeComponent(contextMenu.targetId)"
+          class="block px-4 py-2 hover:bg-gray-100 w-full text-left">
+          Eliminar
+        </button>
+      </div>
+
     </div>
 
   </div>
+
+
 
 
 
@@ -60,83 +57,23 @@
 
 
   <!-- Panel derecho: Propiedades -->
-  <aside class="w-[20%] bg-gray-50 p-4 border-l border-gray-300">
-    <h2 class="text-lg font-semibold mb-4">Propiedades</h2>
-    <div *ngIf="selectedComponent">
-      <!-- <label class="block mb-1">Left (px)</label>
-      <input [ngModel]="parsePxValue(selectedComponent.style.left)" (ngModelChange)="onPositionChange($event, 'left')"
-        type="number" class="w-full border p-1 mb-2">
+  <aside class="w-[20%] bg-zinc-800 p-4 border-none overflow-y-auto h-full">
 
-      <label class="block mb-1">Top (px)</label>
-      <input [ngModel]="parsePxValue(selectedComponent.style.top)" (ngModelChange)="onPositionChange($event, 'top')"
-        type="number" class="w-full border p-1 mb-2">
+<app-navegation></app-navegation>
 
-      <label class="block mb-1">Ancho (px)</label>
-      <input [ngModel]="parsePxValue(selectedComponent.style.width)" (ngModelChange)="onSizeChange($event, 'width')"
-        type="number" class="w-full border p-1 mb-2">
-
-      <label class="block mb-1">Alto (px)</label>
-      <input [ngModel]="parsePxValue(selectedComponent.style.height)" (ngModelChange)="onSizeChange($event, 'height')"
-        type="number" class="w-full border p-1 mb-2">
-      <label class="block mb-1">Color de fondo</label>
-      <input type="color" [(ngModel)]="selectedComponent.style.backgroundColor" class="w-full border p-1 mb-2" />
-      <label class="block mb-1">Grosor del borde (px)</label>
-      <label class="block mb-1">Color de fondo</label> -->
-      <!-- Posición y tamaño -->
-      <label class="block mb-1">Left (px)</label>
-      <input [ngModel]="parsePxValue(selectedComponent.style.left)" (ngModelChange)="onPropertyChange($event, 'left')"
-        type="number" class="w-full border p-1 mb-2">
-
-      <label class="block mb-1">Top (px)</label>
-      <input [ngModel]="parsePxValue(selectedComponent.style.top)" (ngModelChange)="onPropertyChange($event, 'top')"
-        type="number" class="w-full border p-1 mb-2">
-
-      <label class="block mb-1">Ancho (px)</label>
-      <input [ngModel]="parsePxValue(selectedComponent.style.width)" (ngModelChange)="onPropertyChange($event, 'width')"
-        type="number" class="w-full border p-1 mb-2">
-
-      <label class="block mb-1">Alto (px)</label>
-      <input [ngModel]="parsePxValue(selectedComponent.style.height)"
-        (ngModelChange)="onPropertyChange($event, 'height')" type="number" class="w-full border p-1 mb-2">
-
-      <!-- Color de fondo -->
-      <label class="block mb-1">Color de fondo</label>
-      <input type="color" [ngModel]="selectedComponent.style.backgroundColor"
-        (ngModelChange)="onPropertyChange($event, 'backgroundColor')" class="w-full border p-1 mb-2" />
-
-      <label class="block mb-1">Color de texto</label>
-      <input type="color" [ngModel]="selectedComponent.style.color || '#000000'"
-        (ngModelChange)="onPropertyChange($event, 'color')" class="w-full border p-1 mb-2" />
-
-      <!-- Bordes -->
-      <label class="block mb-1">Grosor del borde (px)</label>
-      <input type="number" [ngModel]="getBorderProperty('width')" (ngModelChange)="setBorderProperty('width', $event)"
-        class="w-full border p-1 mb-2" />
-
-      <label class="block mb-1">Color del borde</label>
-      <input type="color" [ngModel]="getBorderProperty('color')" (ngModelChange)="setBorderProperty('color', $event)"
-        class="w-full border p-1 mb-2" />
-
-      <label class="block mb-1">Esquinas redondeadas (px)</label>
-      <div class="flex items-center gap-2">
-        <input type="range" min="0" max="50" step="1"
-          [ngModel]="parsePxValue(selectedComponent.style.borderRadius || '0')"
-          (ngModelChange)="onPropertyChange($event, 'borderRadius')" class="flex-1" />
-        <span class="text-sm w-12 text-center">
-          {{selectedComponent.style.borderRadius || '0px'}}
-        </span>
-      </div>
-    </div>
+    <app-sidebar-der [selectedComponent]="selectedComponent" [roomCode]="roomCode"></app-sidebar-der>
   </aside>
 
   <!-- Template de renderizado recursivo -->
   <ng-template #renderComponent let-comp="comp">
-    <div class="border p-2 text-center cursor-move" [ngStyle]="comp.style"
+    <div class="border p-2 text-center cursor-move" [ngStyle]="comp.style" 
       [style.position]="comp.parentId ? 'absolute' : 'relative'" [style.min-width.px]="50" [style.min-height.px]="40"
       (mousedown)="onMouseDown($event, comp)" (click)="selectComponent(comp, $event)"
       (contextmenu)="onComponentContextMenu($event, comp.id)">
-      {{ comp.label }}
+      <!-- Mostrar el contenido si existe -->
+      {{ comp.content || comp.label }}
 
+      <!-- Renderizar hijos si los hay -->
       <ng-container *ngIf="comp.children">
         <ng-container *ngFor="let child of comp.children">
           <ng-container *ngTemplateOutlet="renderComponent; context: { comp: child }"></ng-container>
@@ -144,22 +81,6 @@
       </ng-container>
     </div>
   </ng-template>
-</div>
 
 
-
-
-
-
-<!-- Modal HTML generado -->
-<div *ngIf="isModalOpen" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
-  <div class="bg-white rounded shadow-lg p-6 w-[80%] max-h-[80%] overflow-auto relative">
-    <h2 class="text-lg font-semibold mb-4">Código HTML Generado</h2>
-    <pre class="text-sm bg-gray-100 p-4 rounded overflow-auto whitespace-pre-wrap max-h-[60vh]">
-{{ exportHtml() }}
-    </pre>
-    <button class="absolute top-2 right-2 text-red-500 hover:text-red-700" (click)="isModalOpen = false">
-      ✖
-    </button>
-  </div>
 </div>

@@ -161,4 +161,31 @@ export class ServerService {
       });
     });
   }
+  //------------
+  // Añade estos métodos en tu ServerService
+
+updateComponentAttributes(roomCode: string, componentId: string, attributeUpdates: {[key: string]: string}) {
+  this.socket.emit('updateComponentAttributes', { roomCode, componentId, attributeUpdates });
+}
+
+updateComponentContent(roomCode: string, componentId: string, content: string) {
+  this.socket.emit('updateComponentContent', { roomCode, componentId, content });
+}
+
+// Y los observables correspondientes
+onComponentAttributesUpdated() {
+  return new Observable<{componentId: string, attributeUpdates: {[key: string]: string}}>(observer => {
+    this.socket.on('componentAttributesUpdated', data => {
+      observer.next(data);
+    });
+  });
+}
+
+onComponentContentUpdated() {
+  return new Observable<{componentId: string, content: string}>(observer => {
+    this.socket.on('componentContentUpdated', data => {
+      observer.next(data);
+    });
+  });
+}
 }

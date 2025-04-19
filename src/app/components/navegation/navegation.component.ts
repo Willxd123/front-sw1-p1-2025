@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ServerService } from '../../services/server.service';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-navegation',
   standalone: true,
-  imports: [],
+  imports: [FormsModule, CommonModule],
   templateUrl: './navegation.component.html',
   styleUrl: './navegation.component.css'
 })
@@ -19,7 +21,7 @@ export class NavegationComponent implements OnInit {
     private route: ActivatedRoute,
     private serverService: ServerService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.roomCode = this.route.snapshot.paramMap.get('code') || '';
