@@ -168,17 +168,173 @@ export class SidebarIzqComponent implements OnInit {
   loadSampleJson() {
     const example: CanvasComponent[] = [
       {
-        id: uuidv4(),
-        style: {
-          top: '30px',
-          left: '30px',
-          width: '400px',
-          height: '200px',
-          backgroundColor: '#ffd0d0',
-          position: 'absolute'
+        "id": "browser-window-container",
+        "type": "div",
+        "style": {
+          "top": "0",
+          "left": "0",
+          "width": "100%",
+          "height": "100%",
+          "backgroundColor": "#ffffff",
+          "position": "relative",
+          "display": "flex",
+          "flexDirection": "column",
+          "border": "4px solid #000000",
+          "borderRadius": "12px"
         },
-        children: [],
-        parentId: null
+        "children": [
+          {
+            "id": "browser-header",
+            "type": "div",
+            "style": {
+              "width": "100%",
+              "height": "40px",
+              "backgroundColor": "#ffffff",
+              "borderBottom": "4px solid #000000",
+              "display": "flex",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "alignItems": "center",
+              "padding": "0 15px"
+            },
+            "parentId": "browser-window-container",
+            "children": [
+              {
+                "id": "browser-controls",
+                "type": "div",
+                "style": {
+                  "display": "flex",
+                  "flexDirection": "row",
+                  "alignItems": "center"
+                },
+                "parentId": "browser-header",
+                "children": [
+                  {
+                    "id": "control-circle-1",
+                    "type": "div",
+                    "style": {
+                      "width": "30px",
+                      "height": "30px",
+                      "borderRadius": "50%",
+                      "border": "4px solid #000000",
+                      "marginRight": "10px"
+                    },
+                    "parentId": "browser-controls"
+                  },
+                  {
+                    "id": "control-circle-2",
+                    "type": "div",
+                    "style": {
+                      "width": "30px",
+                      "height": "30px",
+                      "borderRadius": "50%",
+                      "border": "4px solid #000000",
+                      "marginRight": "10px"
+                    },
+                    "parentId": "browser-controls"
+                  },
+                  {
+                    "id": "control-circle-3",
+                    "type": "div",
+                    "style": {
+                      "width": "30px",
+                      "height": "30px",
+                      "borderRadius": "50%",
+                      "border": "4px solid #000000"
+                    },
+                    "parentId": "browser-controls"
+                  }
+                ]
+              },
+              {
+                "id": "address-bar",
+                "type": "div",
+                "style": {
+                  "width": "300px",
+                  "height": "20px",
+                  "backgroundColor": "#ffffff",
+                  "border": "4px solid #000000",
+                  "borderRadius": "10px"
+                },
+                "parentId": "browser-header"
+              }
+            ]
+          },
+          {
+            "id": "login-form-container",
+            "type": "div",
+            "style": {
+              "width": "100%",
+              "height": "calc(100% - 40px)",
+              "display": "flex",
+              "flexDirection": "column",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "padding": "40px"
+            },
+            "parentId": "browser-window-container",
+            "children": [
+              {
+                "id": "username-input",
+                "type": "div",
+                "style": {
+                  "width": "70%",
+                  "height": "60px",
+                  "border": "4px solid #000000",
+                  "borderRadius": "10px",
+                  "marginBottom": "30px",
+                  "display": "flex",
+                  "justifyContent": "center",
+                  "alignItems": "center"
+                },
+                "parentId": "login-form-container",
+                "children": [
+                  {
+                    "id": "username-text",
+                    "type": "div",
+                    "style": {
+                      "fontSize": "30px",
+                      "fontWeight": "bold",
+                      "fontFamily": "sans-serif",
+                      "color": "#000000",
+                      "textAlign": "center"
+                    },
+                    "content": "LOGIN",
+                    "parentId": "username-input"
+                  }
+                ]
+              },
+              {
+                "id": "password-input",
+                "type": "div",
+                "style": {
+                  "width": "70%",
+                  "height": "60px",
+                  "border": "4px solid #000000",
+                  "borderRadius": "10px",
+                  "display": "flex",
+                  "justifyContent": "center",
+                  "alignItems": "center"
+                },
+                "parentId": "login-form-container",
+                "children": [
+                  {
+                    "id": "password-text",
+                    "type": "div",
+                    "style": {
+                      "fontSize": "30px",
+                      "fontFamily": "sans-serif",
+                      "color": "#000000",
+                      "textAlign": "center"
+                    },
+                    "content": "* * * * *",
+                    "parentId": "password-input"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     ];
 

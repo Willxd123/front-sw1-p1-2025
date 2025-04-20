@@ -84,7 +84,7 @@ export class ApiService {
     });
   }
 
-  // Obtener salas del usuario autenticado
+
   // Obtener salas del usuario autenticado
   getUserRooms(): Observable<any[]> {
     const headers = new HttpHeaders().set(
