@@ -35,8 +35,4 @@ export const routes: Routes = [
     component: RoomsComponent,
     canActivate: [AuthGuard],
   }, // Ruta dinámica para la sala
-/*   {
-    path: 'board',
-    component: BoardComponent,
-  }, */
 ];

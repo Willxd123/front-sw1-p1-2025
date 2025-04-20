@@ -7,7 +7,7 @@ import { ServerService } from '../../../services/server.service';
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [RouterOutlet, FormsModule],
+  imports: [FormsModule],
   providers: [ApiService], // Añadir FormsModule aquí
   templateUrl: './welcome.component.html',
 })

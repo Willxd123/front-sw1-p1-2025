@@ -316,7 +316,7 @@ export class RoomsComponent implements OnInit, AfterViewInit {
     let finalLeft = newLeft;
     let finalTop = newTop;
 
-    if (parent) {
+    /* if (parent) {
       const parentWidth = parseInt(parent.style.width);
       const parentHeight = parseInt(parent.style.height);
       const componentWidth = parseInt(component.style.width);
@@ -324,7 +324,7 @@ export class RoomsComponent implements OnInit, AfterViewInit {
 
       finalLeft = Math.max(0, Math.min(newLeft, parentWidth - componentWidth));
       finalTop = Math.max(0, Math.min(newTop, parentHeight - componentHeight));
-    }
+    } */
 
     // Actualiza localmente
     component.style.left = `${finalLeft}px`;
