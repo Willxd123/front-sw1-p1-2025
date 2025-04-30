@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms'; // Importa FormsModule para habilitar ngModel
 import { ApiService } from '../../../services/api.service';
-import { ServerService } from '../../../services/server.service';
+import { SokectSevice } from '../../../services/socket.service';
 
 @Component({
   selector: 'app-welcome',
@@ -19,7 +19,7 @@ export class WelcomeComponent {
   constructor(
     private apiService: ApiService,
     private router: Router,
-    private serverService: ServerService
+    private SokectSevice: SokectSevice
   ) {}
 
   logout() {

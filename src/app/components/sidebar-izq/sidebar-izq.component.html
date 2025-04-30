@@ -37,43 +37,125 @@
     </ul>
   </div>
 
+  <button (click)="onAddPage()"
+    class="w-full mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold">
+    ➕ Nueva Página
+  </button>
+  <!-- Botón desplegable de páginas -->
+  <div class="w-full">
+    <button type="button"
+      class="flex items-center w-full p-2 text-base text-white transition duration-75 rounded-lg group hover:bg-gray-400 "
+      (click)="dropdownOpen = !dropdownOpen">
+
+      <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Páginas</span>
+      <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+      </svg>
+    </button>
+
+    <!-- Lista desplegable de páginas -->
+    <ul class="py-2 space-y-2" [class.hidden]="!dropdownOpen">
+      <li *ngFor="let page of pages">
+        <a (click)="onSelectPage(page.id)"
+          class="flex items-center w-full p-2 text-white transition duration-75 rounded-lg pl-11 group hover:bg-gray-400 "
+          [ngClass]="{ ' text-white': page.id === selectedPageId }">
+          {{ page.name }}
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Menú contextual de página (para eliminar) -->
+  <div *ngIf="pageContextMenu.visible" [style.left.px]="pageContextMenu.x" [style.top.px]="pageContextMenu.y"
+    class="fixed bg-white border rounded shadow z-[1000]">
+    <button (click)="deletePage(pageContextMenu.targetPageId)"
+      class="block px-4 py-2 hover:bg-gray-100 w-full text-left">
+      🗑️ Eliminar Página
+    </button>
+  </div>
+
+
+
+
+  <!-- Page context menu -->
+  <!-- <div *ngIf="pageContextMenu.visible" [style.left.px]="pageContextMenu.x" [style.top.px]="pageContextMenu.y"
+    class="fixed bg-white border rounded shadow z-[1000]">
+    <button (click)="deletePage(pageContextMenu.targetPageId)"
+      class="block px-4 py-2 hover:bg-gray-100 w-full text-left">
+      🗑️ Eliminar Página
+    </button>
+  </div> -->
+
+  <!-- Add new page button -->
+
+  <!-- Botón de previsualización -->
+  <button (click)="togglePreview.emit()"
+    class="w-full mt-4 py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold">
+    🖥️ {{ isPreview ? 'Salir Previsualizar' : 'Modo Previsualizar' }}
+  </button>
+
+
   <!-- Resto de contenido -->
   <h2 class="text-lg font-semibold text-white">Componentes</h2>
 
-  <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700" (click)="addComponent()">
+  <button class="w-full bg-gray-600 text-white py-2 rounded hover:bg-gray-700" (click)="addComponent()">
     Agregar Caja DIV
   </button>
-  <button class="w-full bg-yellow-600 text-white py-2 rounded hover:bg-yellow-700 mt-2" (click)="addLabelComponent()">
+  <button class="w-full bg-gray-600 text-white py-2 rounded hover:bg-gray-700 mt-2" (click)="addLabelComponent()">
     Agregar Label
   </button>
-  <button class="w-full bg-yellow-600 text-white py-2 rounded hover:bg-yellow-700 mt-2" (click)="addButtonComponent()">
+  <button class="w-full bg-gray-600 text-white py-2 rounded hover:bg-gray-700 mt-2" (click)="addButtonComponent()">
     Agregar button
   </button>
-  <div>
+  <button class="w-full bg-gray-600 text-white py-2 rounded hover:bg-gray-700 mt-2" (click)="addSelectComponent()">
+    Agregar ComboBox
+  </button>
+  <button class="w-full bg-gray-600 text-white py-2 rounded hover:bg-gray-700 mt-2" (click)="addTableComponent()">
+    Agregar Tabla
+  </button>
+
+  <!-- <div>
     <h3 class="text-sm font-semibold mb-2 text-white">JSON del Canvas</h3>
-    <pre class="text-xs bg-gray-100 p-2 rounded h-40 overflow-auto whitespace-pre-wrap">
+    <pre class="text-xs bg-gray-100 p-2 rounded h-80  overflow-auto whitespace-pre-wrap">
 {{ components | json }}
     </pre>
   </div>
+  <div class="mt-4">
+    <h3 class="text-sm font-semibold mb-2 text-white">Estructura Completa (Páginas + Componentes)</h3>
+    <pre class="text-xs bg-gray-100 p-2 rounded h-80 overflow-auto whitespace-pre-wrap">
+  {{ pages | json }}
+    </pre>
+  </div> -->
 
   <button class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" (click)="openHtmlModal()">
     Ver HTML generado
   </button>
 
-  <button class="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 mt-2" (click)="loadSampleJson()">
-    Cargar JSON de ejemplo
-  </button>
+
 </aside>
 
-<!-- Modal HTML generado -->
+
+<!-- Modal HTML generado --><!-- Modal HTML generado -->
 <div *ngIf="isModalOpen" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
-  <div class="bg-white rounded shadow-lg p-6 w-[80%] max-h-[80%] overflow-auto relative">
-    <h2 class="text-lg font-semibold mb-4">Código HTML Generado</h2>
-    <pre class="text-sm bg-gray-100 p-4 rounded overflow-auto whitespace-pre-wrap max-h-[60vh]">
-{{ exportHtml() }}
-    </pre>
+  <div class="bg-white rounded shadow-lg p-6 w-[90%] max-h-[90%] overflow-auto relative grid grid-cols-2 gap-6">
+    <div>
+      <h2 class="text-lg font-semibold mb-2">HTML</h2>
+      <pre class="text-sm bg-gray-100 p-4 rounded overflow-auto whitespace-pre-wrap max-h-[70vh]">
+{{ exportHtml().html }}
+      </pre>
+    </div>
+    <div>
+      <h2 class="text-lg font-semibold mb-2">CSS</h2>
+      <pre class="text-sm bg-gray-100 p-4 rounded overflow-auto whitespace-pre-wrap max-h-[70vh]">
+{{ exportHtml().css }}
+      </pre>
+    </div>
     <button class="absolute top-2 right-2 text-red-500 hover:text-red-700" (click)="isModalOpen = false">
       ✖
     </button>
   </div>
 </div>
+
+
+
+

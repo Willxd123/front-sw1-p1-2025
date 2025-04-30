@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ServerService } from '../../services/server.service';
+import { SokectSevice } from '../../services/socket.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -19,7 +19,7 @@ export class NavegationComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private serverService: ServerService,
+    private SokectSevice: SokectSevice,
     private router: Router
   ) { }
 
@@ -28,10 +28,10 @@ export class NavegationComponent implements OnInit {
   }
   // Método para salir de la sala
   leaveRoom() {
-    this.serverService.leaveRoom(this.roomCode);
+    this.SokectSevice.leaveRoom(this.roomCode);
 
     // Escuchar el evento cuando el usuario ha salido correctamente
-    this.serverService.onLeftRoom().subscribe({
+    this.SokectSevice.onLeftRoom().subscribe({
       next: () => {
         console.log(`Saliste de la sala ${this.roomCode}`);
         this.router.navigate(['/client']); // Redirigir
